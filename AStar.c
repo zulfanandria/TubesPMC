@@ -12,23 +12,25 @@ typedef struct Node
     struct Node *parent;
 } Node;
 
+// Fungsi untuk memeriksa apakah node valid
 int isValid(Point pt, int baris, int kolom)
 {
     return (pt.x >= 0) && (pt.x < kolom) && (pt.y >= 0) && (pt.y < baris);
 }
 
+// Fungsi untuk memeriksa apakah suatu node adalah tujuan
 int isDestination(Point pt, Point dest)
 {
     return (pt.x == dest.x) && (pt.y == dest.y);
 }
 
-double calculateH(Point pt, Point dest)
+// Fungsi untuk menghitung jarak Manhattan antara dua node
+double manhattanDistance(Point pt, Point dest)
 {
-    // return sqrt((pt.x - dest.x) * (pt.x - dest.x) + (pt.y - dest.y) * (pt.y - dest.y));
-    // return (pt.x - dest.x) + (pt.y - dest.y);
     return abs(pt.x - dest.x) + abs(pt.y - dest.y);
 }
 
+// Fungsi untuk membuat node baru
 Node *createNode(Point pt, double g, double h, Node *parent)
 {
     Node *newNode = (Node *)malloc(sizeof(Node));
@@ -40,6 +42,7 @@ Node *createNode(Point pt, double g, double h, Node *parent)
     return newNode;
 }
 
+// Fungsi untuk mencetak labirin dan jalur
 void printMaze(char **maze, int baris, int kolom, Point path[], int path_length)
 {
     for (int y = 0; y < baris; y++)
@@ -68,7 +71,8 @@ void printMaze(char **maze, int baris, int kolom, Point path[], int path_length)
     }
 }
 
-void findPath(char **maze, int baris, int kolom, Point start, Point end)
+// Fungsi untuk mencari jalur terpendek menggunakan algoritma A-Star
+void findshortestPath(char **maze, int baris, int kolom, Point start, Point end)
 {
     clock_t startshortest, endshortest;
     double cpu_time_used_shortest;
@@ -82,7 +86,7 @@ void findPath(char **maze, int baris, int kolom, Point start, Point end)
     Node *openList[baris * kolom];
     int openListSize = 0;
 
-    Node *startNode = createNode(start, 0.0, calculateH(start, end), NULL);
+    Node *startNode = createNode(start, 0.0, manhattanDistance(start, end), NULL);
     openList[openListSize++] = startNode;
 
     int dirX[] = {-1, 1, 0, 0};
@@ -118,7 +122,7 @@ void findPath(char **maze, int baris, int kolom, Point start, Point end)
             if (isValid(neighborPoint, baris, kolom) && maze[neighborPoint.y][neighborPoint.x] != '#' && closedList[neighborPoint.y][neighborPoint.x] == 0)
             {
                 double gNew = currentNode->g + 1.0;
-                double hNew = calculateH(neighborPoint, end);
+                double hNew = manhattanDistance(neighborPoint, end);
                 double fNew = gNew + hNew;
 
                 int foundInOpenList = 0;
@@ -146,12 +150,12 @@ void findPath(char **maze, int baris, int kolom, Point start, Point end)
         }
     }
 
-    // endshortest = clock();
+    endshortest = clock();
 
-    // cpu_time_used_shortest = ((double)(endshortest - startshortest)) / CLOCKS_PER_SEC;
-    // printf("\nTime taken by the function: %.100f seconds", cpu_time_used_shortest);
+    cpu_time_used_shortest = ((double)(endshortest - startshortest)) / CLOCKS_PER_SEC;
+    printf("\nWaktu : %.100f detik", cpu_time_used_shortest);
 
-    printf("Jalur terpendek : \n");
+    printf("\nJalur terpendek : \n");
     if (currentNode && isDestination(currentNode->point, end))
     {
         int path_length = 0;
@@ -179,20 +183,16 @@ void findPath(char **maze, int baris, int kolom, Point start, Point end)
     }
     else
     {
-        printf("No path found!\n");
+        printf("Jalur tidak ditemukan!\n");
     }
 
     for (int i = 0; i < openListSize; i++)
     {
         free(openList[i]);
     }
-
-    endshortest = clock();
-
-    cpu_time_used_shortest = ((double)(endshortest - startshortest)) / CLOCKS_PER_SEC;
-    printf("Time taken by the function: %.100f seconds\n", cpu_time_used_shortest);
 }
 
+// Fungsi untuk mencari jalur terjauh menggunakan algoritma A-Star
 void findLongestPath(char **maze, int baris, int kolom, Point start, Point end)
 {
     clock_t startlongest, endlongest;
@@ -207,7 +207,7 @@ void findLongestPath(char **maze, int baris, int kolom, Point start, Point end)
     Node *openList[baris * kolom];
     int openListSize = 0;
 
-    Node *startNode = createNode(start, 0.0, calculateH(start, end), NULL);
+    Node *startNode = createNode(start, 0.0, manhattanDistance(start, end), NULL);
     openList[openListSize++] = startNode;
 
     int dirX[] = {-1, 1, 0, 0};
@@ -243,7 +243,7 @@ void findLongestPath(char **maze, int baris, int kolom, Point start, Point end)
             if (isValid(neighborPoint, baris, kolom) && maze[neighborPoint.y][neighborPoint.x] != '#' && closedList[neighborPoint.y][neighborPoint.x] == 0)
             {
                 double gNew = currentNode->g + 1.0;
-                double hNew = calculateH(neighborPoint, end);
+                double hNew = manhattanDistance(neighborPoint, end);
                 double fNew = gNew + hNew;
 
                 int foundInOpenList = 0;
@@ -271,10 +271,10 @@ void findLongestPath(char **maze, int baris, int kolom, Point start, Point end)
         }
     }
 
-    // endlongest = clock();
+    endlongest = clock();
 
-    // cpu_time_used_longest = ((double)(endlongest - startlongest)) / CLOCKS_PER_SEC;
-    // printf("\nTime taken by the function: %.100f seconds", cpu_time_used_longest);
+    cpu_time_used_longest = ((double)(endlongest - startlongest)) / CLOCKS_PER_SEC;
+    printf("\nWaktu : %.100f detik", cpu_time_used_longest);
 
     printf("\nJalur terjauh : \n");
     if (currentNode && isDestination(currentNode->point, end))
@@ -304,16 +304,11 @@ void findLongestPath(char **maze, int baris, int kolom, Point start, Point end)
     }
     else
     {
-        printf("No path found!\n");
+        printf("Jalur tidak ditemukan!\n");
     }
 
     for (int i = 0; i < openListSize; i++)
     {
         free(openList[i]);
     }
-
-    endlongest = clock();
-
-    cpu_time_used_longest = ((double)(endlongest - startlongest)) / CLOCKS_PER_SEC;
-    printf("Time taken by the function: %.100f seconds\n", cpu_time_used_longest);
 }

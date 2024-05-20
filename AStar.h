@@ -6,7 +6,8 @@ typedef struct
     int x, y;
 } Point;
 
-void findPath(char **maze, int baris, int kolom, Point start, Point end);
+// Deklarasi fungsi shortestPath dan longestPath
+void findshortestPath(char **maze, int baris, int kolom, Point start, Point end);
 void findLongestPath(char **maze, int baris, int kolom, Point start, Point end);
 
 #endif

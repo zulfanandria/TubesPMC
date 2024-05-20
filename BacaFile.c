@@ -87,7 +87,9 @@ int main()
     }
 
     // Mencari posisi start dan end
-    Point start, end;
+    Point start = {-1, -1}; // Inisialisasi start dan end dengan nilai yang tidak mungkin muncul di labirin
+    Point end = {-1, -1};
+
     for (int y = 0; y < baris; y++)
     {
         for (int x = 0; x < kolom; x++)
@@ -105,8 +107,15 @@ int main()
         }
     }
 
+    // Periksa apakah start dan end telah ditemukan
+    if (start.x == -1 || start.y == -1 || end.x == -1 || end.y == -1)
+    {
+        printf("Titik awal atau akhir tidak ditemukan dalam labirin.\n");
+        return 0;
+    }
+
     // Fungsi mencari shortest path dengan A-Star
-    findPath(matriks, baris, kolom, start, end);
+    findshortestPath(matriks, baris, kolom, start, end);
 
     // Fungsi mencari longest path dengan A-Star
     findLongestPath(matriks, baris, kolom, start, end);
